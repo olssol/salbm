@@ -19,15 +19,14 @@ helpButton <- function(id, label = NULL) {
 
 
 # Header
-header <- dashboardHeader(title = "Salbm")
+header <- dashboardHeader(title = "salbm");
 
 # Sidebar
 sidebar <-  dashboardSidebar(
     sidebarMenu(id = "tabs",
         menuItem("Data", tabName = "data", icon = icon("file")),
         menuItem("Settings", tabName = "settings", icon = icon("cogs")),
-        menuItem("Results", tabName = "results", icon = icon("table")),
-        actionButton("compute", "Submit Data", style = 'margin-top: 20px; margin-left: 66px;')
+        menuItem("Results", tabName = "results", icon = icon("table"))
     )
 )
 
@@ -147,23 +146,23 @@ body <- dashboardBody(
                             fluidRow(
                                 column(6,
                                     fluidRow(
-                                        h6("Number of Trees"),
+                                        h6("Number of Randomforest Trees"),
                                         helpButton("helpTrees"),
                                         style = 'margin-left: 0px;'
                                     ),
                                     numericInput("rf.ntree", "", NULL, min = 1),
                                     fluidRow(
-                                        h6("Nodesize"),
+                                        h6("Node Size"),
                                         helpButton("helpNodesize"),
                                         style = 'margin-left: 0px;'
                                     ),
                                     numericInput("rf.nodesize", "", NULL, min = 1),
                                     fluidRow(
-                                        h6("Seed"),
+                                        h6("Random Seed"),
                                         helpButton("helpSeed"),
                                         style = 'margin-left: 0px;'
                                     ),
-                                    numericInput("rf.seed", "", NULL)
+                                    numericInput("rf.seed", "", NULL, min = 0)
                                 ),
                                 column(6,
                                     fluidRow(
@@ -196,6 +195,14 @@ body <- dashboardBody(
                         )
                     )
                 )
+            ),
+            fluidRow(
+                box(title = "Submit Data for Analysis",
+                    status = "primary",
+                    solidHeader = TRUE,
+                    width = 12,
+                    actionButton("compute", "Conduct Analysis",
+                                 style = 'margin-top: 20px; margin-left: 0px; margin-bottom: 20px'))
             )
         ),
 
@@ -215,7 +222,7 @@ body <- dashboardBody(
     )
 )
 
-# Create UI
+## Create UI
 ui <- dashboardPage(header, sidebar, body);
 
 

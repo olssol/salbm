@@ -28,22 +28,22 @@ genRadio <- function(col.names) {
             "<div class='row'>
             <span class='smdl'></span>
             <span class='smdl'>Treatment</span>
-            <span class='smdl'>Use</span>
+            <span class='smdl'>Outcomes</span>
             <span class='smdlt'>Ignore</span>
             </div>"
         )
     );
-    
-    
+
+
     for (i in 1:length(col.names)) {
         if (i == 1) {
             sel <- "trt";
         } else {
             sel <- "use";
         }
-        
+
         basename <- paste0("colRadio", i);
-        
+
         element[[i+1]] <- fluidRow(
             column(1,
                 h5(col.names[i]),
@@ -63,7 +63,7 @@ genRadio <- function(col.names) {
 
 
 server <- (function(input, output, session) {
-    
+
     # Reactive Values
     data <- reactiveValues();
     data$trt <- NULL;
@@ -74,28 +74,28 @@ server <- (function(input, output, session) {
     data$rf.nodesize <- NULL;
     data$nbootstraps <- NULL;
     data$alphas <- NULL;
-    
+
     data$rawData <- NULL;
     data$dataframe <- NULL;
     data$results <- NULL;
-    
-    
+
+
     # Validation Values
     v <- reactiveValues();
     v$v <- NULL;
     v$u <- NULL;
-    
-    
-    # Dialog Modals
-    callModule(helpModal, "helpUpload", "Upload", "www/placeholder.html");
-    callModule(helpModal, "helpTrees", "Number of Trees", "www/placeholder.html");
+
+
+    ## Dialog Modals
+    callModule(helpModal, "helpUpload", "Upload", "www/help_upload.html");
+    callModule(helpModal, "helpTrees", "Number of Trees", "www/help_tree.html");
     callModule(helpModal, "helpNodesize", "Nodesize",  "www/placeholder.html");
     callModule(helpModal, "helpSeed", "Seed",  "www/placeholder.html");
     callModule(helpModal, "helpBootstraps", "Number of Bootstraps", "www/placeholder.html");
     callModule(helpModal, "helpSampsize", "Sample Size",  "www/placeholder.html");
     callModule(helpModal, "helpAlphas", "Alphas", "www/placeholder.html");
-    
-    
+
+
     # Initialization Of UIs
     output$columns <- renderUI({
         column(12,
@@ -108,21 +108,21 @@ server <- (function(input, output, session) {
             style = 'margin-top: 45px;'
         )
     })
-    
+
     output$msg <- renderText({
         return (NULL);
     })
-    
+
     output$table <- renderUI({
         return (NULL);
     })
-    
+
     output$upload <- renderUI({
         fluidRow(
             style = 'margin-top: 54px;'
         )
     })
-    
+
     output$result <- renderUI({
         column(12,
             infoBox("Missing Information.",
@@ -133,18 +133,18 @@ server <- (function(input, output, session) {
             offset = 4
         )
     })
-    
+
     observeEvent(input$file, {
         if (is.null(input$file)) {
-            
+
             output$upload <- renderUI({
                 fluidRow(
                     style = 'margin-top: 54px;'
                 )
             })
-            
+
         } else {
-            
+
             output$upload <- renderUI({
                 actionButton("upload",
                     "Upload",
@@ -154,8 +154,8 @@ server <- (function(input, output, session) {
             })
         }
     })
-    
-    
+
+
     # Upload File
     observeEvent(input$upload, {
         v$u <- NULL;
@@ -173,18 +173,18 @@ server <- (function(input, output, session) {
             v$u <- TRUE;
         }
     })
-    
-    
+
+
     # Set Up Settings
     observeEvent(v$u, {
         if (is.null(v$u)) return (NULL);
-        
+
         if (v$u == TRUE) {
             updateTextInput(session, "greena", "green", "green");
             updateTextInput(session, "normal", "normal", "normal");
-            
+
             inputName <- input$file;
-            
+
             output$confirm <- renderUI({
                 infoBox(title = "File Uploaded!",
                     value = paste(inputName, "has been uploaded!"),
@@ -194,15 +194,15 @@ server <- (function(input, output, session) {
                     color = 'green'
                 )
             })
-            
+
             output$columns <- renderUI ({
                 do.call(fluidPage, genRadio(names(data$rawData)))
             })
-            
+
             output$msg <- renderText({
                 return (NULL);
             })
-            
+
             # Show RawData
             output$table <- renderUI({
                 fluidRow(
@@ -222,11 +222,11 @@ server <- (function(input, output, session) {
                     )
                 )
             })
-            
+
         } else if (v$u == FALSE) {
             updateTextInput(session, "reda", "red", "red");
             updateTextInput(session, "normal", "normal", "normal");
-            
+
             output$confirm <- renderUI({
                 infoBox(title = "File Not Found!",
                     value = "Unable to locate the file.",
@@ -236,7 +236,7 @@ server <- (function(input, output, session) {
                     color = 'red'
                 )
             })
-            
+
             output$columns <- renderUI({
                 column(12,
                     infoBox("Waiting for Data...",
@@ -252,37 +252,37 @@ server <- (function(input, output, session) {
             output$msg <- renderText({
                 return (NULL);
             })
-            
+
             output$table <- renderUI({
                 return (NULL);
             })
         }
     })
-    
-    
+
+
     # Validation
     observeEvent(input$validate, {
-        
+
         # If a Data Does Not Exist
         if (is.null(data$rawData)) {
             v$v <- FALSE;
             return (NULL);
         }
-        
+
         # Collect Result From genRadio
         col.result <- c();
         for (i in 1:NCOL(data$rawData)) {
             current <- input[[paste0("colRadio", i)]];
             col.result <- c(col.result, current);
         }
-        
+
         # Test Number of Treatment/Use/Ignore
         if (length(which(col.result == "use")) < 2 || length(which(col.result == "trt")) != 1)
         {
             v$v <- FALSE;
             return (NULL);
         }
-        
+
         #  Make New Dataframe.
         newData <- c(data$rawData[,which(col.result == "trt")]);
         for (i in which(col.result == "use")){
@@ -291,13 +291,13 @@ server <- (function(input, output, session) {
         }
         colnames(newData)[1] <- colnames(data$rawData)[which(col.result == "trt")];
         newData <- as.data.frame(newData);
-        
+
         # Check if trt Column Only Contains Two Unique Integers
         if (length(unique(newData[,1])) != 2) {
             v$v <- FALSE;
             return (NULL);
         }
-        
+
         # Check if use Column only Contains 0, 1, or NA
         for (i in 2:NCOL(newData)) {
             if (!all(!is.na(match(newData[,i], c(1, 0, NA))))) {
@@ -305,7 +305,7 @@ server <- (function(input, output, session) {
                 return (NULL);
             }
         }
-        
+
         # Check For NA in Settings and Invalid Settings
         if (is.na(input$rf.ntree) ||
             is.na(input$rf.seed) ||
@@ -324,7 +324,7 @@ server <- (function(input, output, session) {
             v$v <- FALSE;
             return (NULL);
         }
-        
+
         data$dataframe <- newData;
         data$trt <- colnames(newData)[1];
         data$trtlev <- unique(newData[,1]);
@@ -335,46 +335,45 @@ server <- (function(input, output, session) {
         data$nbootstraps <- input$nbootstraps;
         data$alphas <- sort(as.numeric(strsplit(input$alphas, ",")[[1]]))[1]:
             sort(as.numeric(strsplit(input$alphas, ",")[[1]]))[2];
-        
+
         v$v <- TRUE
     })
-    
-    
+
+
     # Comfirming Validation
     observeEvent(v$v, {
-        if (is.null(v$v)) return (NULL);
-        
+        if (is.null(v$v))
+            return(NULL);
+
         if (v$v == TRUE) {
-            
             updateTextInput(session, "greenb", "green", "green");
-            
             output$msg <- renderText({
                 "Validation successful! Please click on 'Submit Data' to get your results.";
             })
-            
+
         } else {
-            
+
             updateTextInput(session, "redb", "red", "red");
-            
+
             output$msg <- renderText({
                 "Validation failed. Please make sure your data and settings meet all the requirements.";
             })
         }
     })
-    
-     
+
+
     # Example
     observeEvent(input$example, {
         if (input$example == 0) return (NULL);
         if (is.null(input$example)) return (NULL);
-        
+
         data("salbmData");
-        
+
         data$rawData <- salbmData;
         data$dataframe <- salbmData;
-        
+
         updateTextInput(session, "greena", "green", "green");
-        
+
         output$confirm <- renderUI({
             infoBox(title = "File Uploaded!",
                 value = "Example data 'salbmData' has been loaded!",
@@ -384,7 +383,7 @@ server <- (function(input, output, session) {
                 color = 'green'
             )
         })
-        
+
         output$table <- renderUI({
             fluidRow(
                 column(12,
@@ -403,21 +402,21 @@ server <- (function(input, output, session) {
                 )
             )
         })
-        
+
         output$columns <- renderUI ({
             do.call(fluidPage, genRadio(names(isolate(data$dataframe))))
         })
-        
+
         updateNumericInput(session, "rf.ntree", "", value = 25);
         updateNumericInput(session, "rf.nodesize", "", value = 3);
         updateNumericInput(session, "rf.seed", "", value = -172);
         updateNumericInput(session, "nbootstraps", "", value = 5);
         updateNumericInput(session, "rf.sampsize", "", value = 90);
         updateTextInput(session, "alphas", "", value = "-1, 1");
-        
-        
+
+
         v$v <- TRUE;
-        
+
         data$trt <- colnames(data$dataframe)[1];
         data$trtlev <- unique(data$dataframe[,1]);
         data$rf.ntree <- 25;
@@ -433,7 +432,7 @@ server <- (function(input, output, session) {
     observeEvent(input$compute, {
         if (input$compute == 0) return (NULL);
         if (is.null(input$compute)) return (NULL);
-        
+
         if (is.null(v$v) || v$v == FALSE) {
             showModal(
                 modalDialog(
@@ -446,7 +445,7 @@ server <- (function(input, output, session) {
             )
             return (NULL);
         }
-        
+
         showModal(
             modalDialog(
                 title = "Computing with Salbm...",
@@ -460,7 +459,7 @@ server <- (function(input, output, session) {
                 size = 's'
             )
         )
-        
+
         print("Data:");
         print(data$dataframe);
         print(paste("trt:", data$trt));
@@ -471,7 +470,7 @@ server <- (function(input, output, session) {
         print(paste("rf.nodesize:", data$rf.nodesize))
         print(paste("nbootstraps:", data$nbootstraps));
         print(paste("alphas:", paste(data$alphas, collapse=" ")));
-        
+
         data$result <- salbm(data = data$dataframe,
             trt = data$trt,
             trtlev = data$trtlev,
@@ -482,11 +481,11 @@ server <- (function(input, output, session) {
             nbootstraps = data$nbootstraps,
             alphas = data$alphas
         );
-        
+
         output$result <- renderUI({
             tabBox(title = "Results",
                 width = 12,
-                
+
                 tabPanel("Results1",
                     DT::renderDataTable({
                         DT::datatable(isolate(data$result$Results1),
@@ -495,7 +494,7 @@ server <- (function(input, output, session) {
                         formatRound(columns = colnames(isolate(data$result$Results1)), digits = 6)
                     })
                 ),
-                
+
                 tabPanel("Results2",
                     DT::renderDataTable({
                         DT::datatable(isolate(data$result$Results2),
@@ -504,7 +503,7 @@ server <- (function(input, output, session) {
                         formatRound(columns = colnames(isolate(data$result$Results2)), digits = 6)
                     })
                 ),
-                
+
                 tabPanel("ResultsD",
                     DT::renderDataTable({
                         DT::datatable(isolate(data$result$ResultsD),
@@ -513,7 +512,7 @@ server <- (function(input, output, session) {
                         formatRound(columns = colnames(isolate(data$result$ResultsD)), digits = 6)
                     })
                 ),
-                
+
                 tabPanel("bootstraps1",
                     DT::renderDataTable({
                         DT::datatable(isolate(data$result$bootstraps1),
@@ -522,7 +521,7 @@ server <- (function(input, output, session) {
                         formatRound(columns = colnames(isolate(data$result$bootstraps1)), digits = 6)
                     })
                 ),
-                
+
                 tabPanel("bootstraps2",
                     DT::renderDataTable({
                         DT::datatable(isolate(data$result$bootstraps2),
@@ -531,7 +530,7 @@ server <- (function(input, output, session) {
                         formatRound(columns = colnames(isolate(data$result$bootstraps2)), digits = 6)
                     })
                 ),
-                
+
                 tabPanel("bootstrapsD",
                     DT::renderDataTable({
                         DT::datatable(isolate(data$result$bootstrapsD),
@@ -540,7 +539,7 @@ server <- (function(input, output, session) {
                         formatRound(columns = colnames(isolate(data$result$bootstrapsD)), digits = 6)
                     })
                 ),
-                
+
                 tabPanel("CI1",
                     DT::renderDataTable({
                         DT::datatable(isolate(data$result$CI1),
@@ -549,7 +548,7 @@ server <- (function(input, output, session) {
                         formatRound(columns = colnames(isolate(data$result$CI1)), digits = 6)
                     })
                 ),
-                
+
                 tabPanel("CI2",
                     DT::renderDataTable({
                         DT::datatable(isolate(data$result$CI2),
@@ -558,7 +557,7 @@ server <- (function(input, output, session) {
                         formatRound(columns = colnames(isolate(data$result$CI2)), digits = 6)
                     })
                 ),
-                
+
                 tabPanel("CID",
                     DT::renderDataTable({
                         DT::datatable(isolate(data$result$CID),
@@ -569,7 +568,7 @@ server <- (function(input, output, session) {
                 )
             )
         })
-        
+
         removeModal();
         updateTabItems(session, "tabs", selected = "results");
     })

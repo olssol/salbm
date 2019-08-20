@@ -13,33 +13,30 @@
 #' @export
 #'
 salbmShiny <- function() {
-    
     if (!requireNamespace("shiny", quietly = TRUE)) {
         stop("Shiny is needed for this function to work. Please install it.",
         call. = FALSE)
     }
-    
+
     if (!requireNamespace("DT", quietly = TRUE)) {
         stop("DT is needed for this function to work. Please install it.",
         call. = FALSE)
     }
-    
+
     if (!requireNamespace("shinydashboard", quietly = TRUE)) {
         stop("shinydashboard is needed for this function to work. Please install it.",
         call. = FALSE)
     }
-    
+
     if (!requireNamespace("dplyr", quietly = TRUE)) {
         stop("dplyr is needed for this function to work. Please install it.",
         call. = FALSE)
     }
-    
+
     appDir <- system.file("shiny", package = "salbm")
     if (appDir == "") {
         stop("Could not find Shiny directory. Try re-installing `salbm`.",
         call. = FALSE)
     }
-    
-    
     shiny::runApp(appDir, display.mode = "normal");
 }
