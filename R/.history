@@ -1,0 +1,24 @@
+setwd("../")
+setwd("../")
+getwd()
+require(devtools)
+load_all()
+load_all("salbm")
+load_all("salbm")
+data("salbmData")
+
+Results <- salbm(
+  data           =  salbmData,
+  trtname        =  "trt",       # treatment indicator
+  trtlev         =  c(1,2),      # treatment values 
+    
+  rf.ntree       =    25,        # num trees in the forest
+  rf.seed        =  -172,        
+  rf.sampsize    =    90,         
+  rf.nodesize    =     3,
+
+  nbootstraps    =     5,
+  alphas         =  -1:1 )
+
+Results
+q()

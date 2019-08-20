@@ -1,0 +1,55 @@
+/* Fonts */
+h1, h2, h3, h4, h5, h6 {
+    line-height: 1.4em;
+    margin-top: 0px;
+    margin-bottom: 5px;
+    color: black;
+}
+
+h6 {
+    display: inline-block;
+    max-width: 100%;
+    font-weight: 500;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Radio Buttons */
+.smdl {
+    display: inline-block;
+    width: auto;
+    text-align: center;
+    font-family: "Lora", sans-serif;
+    font-size: 1em;
+    font-weight: 700;
+    padding: 10px 32px 10px 16px;
+}
+
+.smdlt {
+    display: inline-block;
+    width: auto;
+    text-align: center;
+    font-family: "Lora", sans-serif;
+    font-size: 1em;
+    font-weight: 700;
+    padding: 10px 20px 10px 16px;
+}
+
+#radio label.radio-inline {
+    width: auto;
+    margin: -20px 0px 0px 0px;
+    padding: 0px 0px 0px 85px;
+}
+
+
+#radio .row {
+    border-bottom: 1px solid #369;
+}
+
+#radio h5 {
+    padding-top: 15px;
+}
+
+#radio .form-group {
+    margin-left: -20px;
+}

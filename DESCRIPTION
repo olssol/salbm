@@ -1,0 +1,21 @@
+Package: salbm
+Version: 1.0.0
+Type: Package
+Date: 2019-06-06
+Title: Sensitivity Analysis for Longitudinal Binary Missing Data
+Authors@R: c(person("Daniel", "O. Scharfstein", role = c("aut"), email = "dscharf@jhu.edu" ),
+             person("Aidan", "McDermott", role = c("aut", "cre"), email = "amcderm1@jhu.edu"),
+             person("Chenguang", "Wang", role = c("aut", "cre"), email = "cwang68@jhmi.edu")) 
+Author: Daniel O. Scharfstein [aut], Aidan McDermott [aut, cre]
+Maintainer: Aidan McDermott <amcderm1@jhu.edu>
+Description: In clinical trials with repeated binary measures, the outcome may be missing.  In this package random forests are employed to model the joint probability of missingness and the binary outcome.  A sensitivity parameter is employed to estimate the underlying joint distribution of the binary outcome.
+License: GPL-2
+Depends: R (>= 2.10)
+Imports: randomForestSRC
+Suggests:
+    shiny,
+    shinydashboard,
+    DT,
+    dpylr,
+NeedsCompilation: no
+Packaged: 2019-06-11 22:39:37 UTC; amcdermo
