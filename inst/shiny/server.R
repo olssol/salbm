@@ -64,24 +64,24 @@ genRadio <- function(col.names) {
 
 server <- (function(input, output, session) {
 
-    # Reactive Values
-    data <- reactiveValues();
-    data$trt <- NULL;
-    data$trtlev <- NULL;
-    data$rf.ntree <- NULL;
-    data$rf.seed <- NULL;
+    ## Reactive Values
+    data             <- reactiveValues();
+    data$trt         <- NULL;
+    data$trtlev      <- NULL;
+    data$rf.ntree    <- NULL;
+    data$rf.seed     <- NULL;
     data$rf.sampsize <- NULL;
     data$rf.nodesize <- NULL;
     data$nbootstraps <- NULL;
-    data$alphas <- NULL;
+    data$alphas      <- NULL;
 
-    data$rawData <- NULL;
-    data$dataframe <- NULL;
-    data$results <- NULL;
+    data$rawData     <- NULL;
+    data$dataframe   <- NULL;
+    data$results     <- NULL;
 
 
-    # Validation Values
-    v <- reactiveValues();
+    ## Validation Values
+    v   <- reactiveValues();
     v$v <- NULL;
     v$u <- NULL;
 
@@ -134,6 +134,10 @@ server <- (function(input, output, session) {
         )
     })
 
+    output$compute <- renderUI ({
+        return (NULL);
+    })
+
     observeEvent(input$file, {
         if (is.null(input$file)) {
 
@@ -178,6 +182,10 @@ server <- (function(input, output, session) {
     # Set Up Settings
     observeEvent(v$u, {
         if (is.null(v$u)) return (NULL);
+
+        output$compute <- renderUI({
+            return (NULL);
+        })
 
         if (v$u == TRUE) {
             updateTextInput(session, "greena", "green", "green");
@@ -351,12 +359,30 @@ server <- (function(input, output, session) {
                 "Validation successful! Please click on 'Submit Data' to get your results.";
             })
 
+            output$compute <- renderUI ({
+                fluidRow(
+                    box(
+                        title = "Submit Data for Analysis",
+                        status = "success",
+                        solidHeader = TRUE,
+                        width = 12,
+                        actionButton("compute", "Conduct Analysis",
+                            style = 'margin-top: 20px; margin-left: 0px; margin-bottom: 20px'
+                        )
+                    )
+                )
+            })
+
         } else {
 
             updateTextInput(session, "redb", "red", "red");
 
             output$msg <- renderText({
                 "Validation failed. Please make sure your data and settings meet all the requirements.";
+            })
+
+            output$compute <- renderUI ({
+                return (NULL);
             })
         }
     })
@@ -409,18 +435,18 @@ server <- (function(input, output, session) {
 
         updateNumericInput(session, "rf.ntree", "", value = 25);
         updateNumericInput(session, "rf.nodesize", "", value = 3);
-        updateNumericInput(session, "rf.seed", "", value = -172);
+        updateNumericInput(session, "rf.seed", "", value = 0);
         updateNumericInput(session, "nbootstraps", "", value = 5);
         updateNumericInput(session, "rf.sampsize", "", value = 90);
         updateTextInput(session, "alphas", "", value = "-1, 1");
 
-
         v$v <- TRUE;
 
-        data$trt <- colnames(data$dataframe)[1];
-        data$trtlev <- unique(data$dataframe[,1]);
-        data$rf.ntree <- 25;
-        data$rf.seed <- -172;
+
+        data$trt         <- colnames(data$dataframe)[1];
+        data$trtlev      <- unique(data$dataframe[,1]);
+        data$rf.ntree    <- 25;
+        data$rf.seed     <-  0;
         data$rf.sampsize <- 90;
         data$rf.nodesize <- 3;
         data$nbootstraps <- 5;
@@ -460,16 +486,16 @@ server <- (function(input, output, session) {
             )
         )
 
-        print("Data:");
-        print(data$dataframe);
-        print(paste("trt:", data$trt));
-        print(paste("trtlev:", paste(data$trtlev, collapse=" ")));
-        print(paste("rf.ntree:", data$rf.ntree));
-        print(paste("rf.seed:", data$rf.seed));
-        print(paste("rf.sampsize:", data$rf.sampsize));
-        print(paste("rf.nodesize:", data$rf.nodesize))
-        print(paste("nbootstraps:", data$nbootstraps));
-        print(paste("alphas:", paste(data$alphas, collapse=" ")));
+        ## print("Data:");
+        ## print(data$dataframe);
+        ## print(paste("trt:", data$trt));
+        ## print(paste("trtlev:", paste(data$trtlev, collapse=" ")));
+        ## print(paste("rf.ntree:", data$rf.ntree));
+        ## print(paste("rf.seed:", data$rf.seed));
+        ## print(paste("rf.sampsize:", data$rf.sampsize));
+        ## print(paste("rf.nodesize:", data$rf.nodesize))
+        ## print(paste("nbootstraps:", data$nbootstraps));
+        ## print(paste("alphas:", paste(data$alphas, collapse=" ")));
 
         data$result <- salbm(data = data$dataframe,
             trt = data$trt,
@@ -483,93 +509,116 @@ server <- (function(input, output, session) {
         );
 
         output$result <- renderUI({
-            tabBox(title = "Results",
-                width = 12,
+            div(tabBox(title = "Results",
+                   width = 12,
+                   tabPanel("Results 1",
+                            DT::renderDataTable({
+                                DT::datatable(isolate(data$result$Results1),
+                                              options = list(searching = FALSE, dom = 'ft')
+                                              ) %>%
+                                    formatRound(columns = colnames(isolate(data$result$Results1)), digits = 6)
+                            })
+                            ),
 
-                tabPanel("Results1",
-                    DT::renderDataTable({
-                        DT::datatable(isolate(data$result$Results1),
-                            options = list(searching = FALSE, dom = 'ft')
-                        ) %>%
-                        formatRound(columns = colnames(isolate(data$result$Results1)), digits = 6)
-                    })
-                ),
+                   tabPanel("Results 2",
+                            DT::renderDataTable({
+                                DT::datatable(isolate(data$result$Results2),
+                                              options = list(searching = FALSE, dom = 'ft')
+                                              ) %>%
+                                    formatRound(columns = colnames(isolate(data$result$Results2)), digits = 6)
+                            })
+                            ),
 
-                tabPanel("Results2",
-                    DT::renderDataTable({
-                        DT::datatable(isolate(data$result$Results2),
-                            options = list(searching = FALSE, dom = 'ft')
-                        ) %>%
-                        formatRound(columns = colnames(isolate(data$result$Results2)), digits = 6)
-                    })
-                ),
+                   tabPanel("Results D",
+                            DT::renderDataTable({
+                                DT::datatable(isolate(data$result$ResultsD),
+                                              options = list(searching = FALSE, dom = 'ft')
+                                              ) %>%
+                                    formatRound(columns = colnames(isolate(data$result$ResultsD)), digits = 6)
+                            })
+                            ),
 
-                tabPanel("ResultsD",
-                    DT::renderDataTable({
-                        DT::datatable(isolate(data$result$ResultsD),
-                            options = list(searching = FALSE, dom = 'ft')
-                        ) %>%
-                        formatRound(columns = colnames(isolate(data$result$ResultsD)), digits = 6)
-                    })
-                ),
+                   tabPanel("Bootstraps 1",
+                            DT::renderDataTable({
+                                DT::datatable(isolate(data$result$bootstraps1),
+                                              options = list(searching = FALSE, dom = 'ft')
+                                              )  %>%
+                                    formatRound(columns = colnames(isolate(data$result$bootstraps1)), digits = 6)
+                            })
+                            ),
 
-                tabPanel("bootstraps1",
-                    DT::renderDataTable({
-                        DT::datatable(isolate(data$result$bootstraps1),
-                            options = list(searching = FALSE, dom = 'ft')
-                        )  %>%
-                        formatRound(columns = colnames(isolate(data$result$bootstraps1)), digits = 6)
-                    })
-                ),
+                   tabPanel("Bootstraps2",
+                            DT::renderDataTable({
+                                DT::datatable(isolate(data$result$bootstraps2),
+                                              options = list(searching = FALSE, dom = 'ft')
+                                              ) %>%
+                                    formatRound(columns = colnames(isolate(data$result$bootstraps2)), digits = 6)
+                            })
+                            ),
 
-                tabPanel("bootstraps2",
-                    DT::renderDataTable({
-                        DT::datatable(isolate(data$result$bootstraps2),
-                            options = list(searching = FALSE, dom = 'ft')
-                        ) %>%
-                        formatRound(columns = colnames(isolate(data$result$bootstraps2)), digits = 6)
-                    })
-                ),
+                   tabPanel("bootstraps D",
+                            DT::renderDataTable({
+                                DT::datatable(isolate(data$result$bootstrapsD),
+                                              options = list(searching = FALSE, dom = 'ft')
+                                              ) %>%
+                                    formatRound(columns = colnames(isolate(data$result$bootstrapsD)), digits = 6)
+                            })
+                            ),
 
-                tabPanel("bootstrapsD",
-                    DT::renderDataTable({
-                        DT::datatable(isolate(data$result$bootstrapsD),
-                            options = list(searching = FALSE, dom = 'ft')
-                        ) %>%
-                        formatRound(columns = colnames(isolate(data$result$bootstrapsD)), digits = 6)
-                    })
-                ),
+                   tabPanel("CI 1",
+                            DT::renderDataTable({
+                                DT::datatable(isolate(data$result$CI1),
+                                              options = list(searching = FALSE, dom = 'ft')
+                                              ) %>%
+                                    formatRound(columns = colnames(isolate(data$result$CI1)), digits = 6)
+                            })
+                            ),
 
-                tabPanel("CI1",
-                    DT::renderDataTable({
-                        DT::datatable(isolate(data$result$CI1),
-                            options = list(searching = FALSE, dom = 'ft')
-                        ) %>%
-                        formatRound(columns = colnames(isolate(data$result$CI1)), digits = 6)
-                    })
-                ),
+                   tabPanel("CI 2",
+                            DT::renderDataTable({
+                                DT::datatable(isolate(data$result$CI2),
+                                              options = list(searching = FALSE, dom = 'ft')
+                                              ) %>%
+                                    formatRound(columns = colnames(isolate(data$result$CI2)), digits = 6)
+                            })
+                            ),
 
-                tabPanel("CI2",
-                    DT::renderDataTable({
-                        DT::datatable(isolate(data$result$CI2),
-                            options = list(searching = FALSE, dom = 'ft')
-                        ) %>%
-                        formatRound(columns = colnames(isolate(data$result$CI2)), digits = 6)
-                    })
-                ),
-
-                tabPanel("CID",
-                    DT::renderDataTable({
-                        DT::datatable(isolate(data$result$CID),
-                            options = list(searching = FALSE, dom = 'ft')
-                        ) %>%
-                        formatRound(columns = colnames(isolate(data$result$CID)), digits = 6)
-                    })
-                )
-            )
+                   tabPanel("CI D",
+                            DT::renderDataTable({
+                                DT::datatable(isolate(data$result$CID),
+                                              options = list(searching = FALSE, dom = 'ft')
+                                              ) %>%
+                                    formatRound(columns = colnames(isolate(data$result$CID)), digits = 6)
+                            })
+                            )
+                   ),
+                ##output
+                box(title = "Download Setting and Results",
+                    status = "primary",
+                    width = 12,
+                    downloadButton(
+                        outputId = "download",
+                        label = "Download",
+                        style = 'margin-top: 20px;'
+                    )))
         })
 
         removeModal();
         updateTabItems(session, "tabs", selected = "results");
     })
+
+    ## download Results
+    output$download <- downloadHandler(
+        filename = function() {
+            paste0('salbm-result-',
+                   format(Sys.time(), "%m%d%Y%H%M%S"),
+                   '.RData'
+                   )
+        },
+        content = function(file) {
+            results <- data$result;
+            save(results, file = file);
+        }
+    )
+
 })

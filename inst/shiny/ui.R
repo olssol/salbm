@@ -17,30 +17,9 @@ helpButton <- function(id, label = NULL) {
     )
 }
 
-
-# Header
-header <- dashboardHeader(title = "salbm");
-
-# Sidebar
-sidebar <-  dashboardSidebar(
-    sidebarMenu(id = "tabs",
-        menuItem("Data", tabName = "data", icon = icon("file")),
-        menuItem("Settings", tabName = "settings", icon = icon("cogs")),
-        menuItem("Results", tabName = "results", icon = icon("table"))
-    )
-)
-
-# Body
-body <- dashboardBody(
-    tags$style(".shiny-file-input-progress {display: none}"),
-    includeHTML("www/color.html"),
-    tags$head(
-        tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
-    ),
-    tabItems(
-
-        # Data Tab
-        tabItem(tabName = "data",
+## tab data
+tab.data  <- function() {
+    tabItem(tabName = "data",
             fluidRow(
                 box(title = "Data",
                     status = "info",
@@ -48,81 +27,84 @@ body <- dashboardBody(
                     collapsible = TRUE,
                     width = 12,
 
-                    # File Input
+                                        # File Input
                     column(3,
-                        fluidRow(
-                            h6("Upload a CSV File"),
-                            helpButton("helpUpload"),
-                            style = 'margin-top: 20px;'
-                        ),
-                        fluidRow(
-                            fileInput("file", "",
-                                accept = c("text/csv",
-                                    "text/comma-separated-values",
-                                    "text/plain",
-                                    ".csv"
-                                )
-                            )
-                        ),
-                        fluidRow(
-                            column(6,
-                                uiOutput("upload"),
-                                actionButton("example",
-                                    "Try an Example",
-                                    width = '150px',
-                                    style = 'margin-bottom: 40px; margin-top: 30px;'
-                                ),
-                                offset = 2,
-                                style = 'text-align: center'
-                            )
-                        )
+                           fluidRow(
+                               h6("Upload a CSV File"),
+                               helpButton("helpUpload"),
+                               style = 'margin-top: 20px;'
+                           ),
+                           fluidRow(
+                               fileInput("file", "",
+                                         accept = c("text/csv",
+                                                    "text/comma-separated-values",
+                                                    "text/plain",
+                                                    ".csv"
+                                                    )
+                                         )
+                           ),
+                           fluidRow(
+                               column(6,
+                                      uiOutput("upload"),
+                                      actionButton("example",
+                                                   "Try an Example",
+                                                   width = '150px',
+                                                   style = 'margin-bottom: 40px; margin-top: 30px;'
+                                                   ),
+                                      offset = 2,
+                                      style = 'text-align: center'
+                                      )
+                           )
+                           ),
+
+                                        # read.csv parameters
+                    column(8,
+                           fluidRow(
+                               column(3,
+                                      radioButtons("sep",
+                                                   "Separator",
+                                                   c(Comma = ',', Semicolon = ';', Tab = '\t', Space = ' '),
+                                                   selected = ',',
+                                                   ),
+                                      offset = 1
+                                      ),
+                               column(3,
+                                      radioButtons("quote",
+                                                   "Quote",
+                                                   c(None = '', 'Double Quote' = '"', 'Single Quote' = "'"),
+                                                   selected = ''
+                                                   )
+                                      ),
+                               column(3,
+                                      radioButtons("nastrings",
+                                                   "NA string",
+                                                   c('NA' = "NA", '.' = '.'),
+                                                   selected = 'NA')
+                                      ),
+                               column(2,
+                                      h6("Other"),
+                                      checkboxInput(inputId = "header", label = "Header", value = TRUE)
+                                      ),
+                               style = 'margin-top: 20px;'
+                           ),
+                           fluidRow(
+                               column(8,
+                                      uiOutput("confirm"),
+                                      offset = 2
+                                      )
+                           )
+                           )
                     ),
 
-                    # read.csv parameters
-                    column(8,
-                        fluidRow(
-                            column(3,
-                                radioButtons("sep",
-                                    "Separator",
-                                    c(Comma = ',', Semicolon = ';', Tab = '\t', Space = ' '),
-                                    selected = ',',
-                                ),
-                                offset = 1
-                            ),
-                            column(3,
-                                radioButtons("quote",
-                                    "Quote",
-                                    c(None = '', 'Double Quote' = '"', 'Single Quote' = "'"),
-                                    selected = ''
-                                )
-                            ),
-                            column(3,
-                                radioButtons("nastrings",
-                                    "NA string",
-                                    c('NA' = "NA", '.' = '.'),
-                                    selected = 'NA')
-                            ),
-                            column(2,
-                                h6("Other"),
-                                checkboxInput(inputId = "header", label = "Header", value = TRUE)
-                            ),
-                            style = 'margin-top: 20px;'
-                        ),
-                        fluidRow(
-                            column(8,
-                                uiOutput("confirm"),
-                                offset = 2
-                            )
-                        )
-                    )
-                ),
-
-                # Show Input Table After Uploading
+                ## Show Input Table After Uploading
                 uiOutput("table")
             )
-        ),
+            )
+}
 
-        # Setting Tab
+
+## setting tab
+tab.setting <- function() {
         tabItem(tabName = "settings",
             fluidRow(
                 box(title = "Settings",
@@ -159,10 +141,10 @@ body <- dashboardBody(
                                     numericInput("rf.nodesize", "", NULL, min = 1),
                                     fluidRow(
                                         h6("Random Seed"),
-                                        helpButton("helpSeed"),
+                                        ##helpButton("helpSeed"),
                                         style = 'margin-left: 0px;'
                                     ),
-                                    numericInput("rf.seed", "", NULL, min = 0)
+                                    numericInput("rf.seed", "", value = 1000, min = 0)
                                 ),
                                 column(6,
                                     fluidRow(
@@ -196,29 +178,57 @@ body <- dashboardBody(
                     )
                 )
             ),
-            fluidRow(
-                box(title = "Submit Data for Analysis",
-                    status = "primary",
-                    solidHeader = TRUE,
-                    width = 12,
-                    actionButton("compute", "Conduct Analysis",
-                                 style = 'margin-top: 20px; margin-left: 0px; margin-bottom: 20px'))
-            )
-        ),
-
-        # Result Tab
-        tabItem(tabName = "results",
-            uiOutput("result"),
-
-            # Hidden Panel
-            conditionalPanel(condition = "input.copmute == 1000",
-                textInput("greena", "green", "green"),
-                textInput("greenb", "green", "green"),
-                textInput("reda", "red", "red"),
-                textInput("redb", "red", "red"),
-                textInput("normal", "normal", "normal")
-            )
+            uiOutput("compute")
         )
+}
+
+## tab result
+tab.result <- function() {
+    tabItem(tabName = "results",
+            uiOutput("result"),
+            ## Hidden Panel
+            conditionalPanel(condition = "input.copmute == 1000",
+                             textInput("greena", "green", "green"),
+                             textInput("greenb", "green", "green"),
+                             textInput("reda", "red", "red"),
+                             textInput("redb", "red", "red"),
+                             textInput("normal", "normal", "normal")
+                             )
+            )
+}
+
+##---------------------------------------------------------------------------------
+##
+##                              MAIN UI
+##
+##---------------------------------------------------------------------------------
+
+## Header
+header <- dashboardHeader(title = "salbm");
+
+## Sidebar
+sidebar <-  dashboardSidebar(
+    sidebarMenu(id = "tabs",
+        menuItem("Data", tabName = "data", icon = icon("file")),
+        menuItem("Settings", tabName = "settings", icon = icon("cogs")),
+        menuItem("Results", tabName = "results", icon = icon("table"))
+    )
+)
+
+## Body
+body <- dashboardBody(
+    tags$style(".shiny-file-input-progress {display: none}"),
+    includeHTML("www/color.html"),
+    tags$head(
+        tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
+    ),
+    tabItems(
+        ## Data Tab
+        tab.data(),
+        ## Setting Tab
+        tab.setting(),
+        # Result Tab
+        tab.result()
     )
 )
 
