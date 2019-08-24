@@ -105,79 +105,64 @@ tab.data  <- function() {
 
 ## setting tab
 tab.setting <- function() {
-        tabItem(tabName = "settings",
+    tabItem(tabName = "settings",
             fluidRow(
                 box(title = "Settings",
                     status = "primary",
                     solidHeader = TRUE,
                     collapsible = TRUE,
-                    footer = textOutput("msg"),
+                    ##footer = textOutput("msg"),
                     width = 12,
-
-                    # Column Selection
-                    column(5,
-                        fluidPage(
-                            id = 'radio',
-                            uiOutput("columns")
-                        )
-                    ),
-
-                    # Parameters
-                    column(7,
-                        fluidPage(
-                            fluidRow(
-                                column(6,
-                                    fluidRow(
-                                        h6("Number of Randomforest Trees"),
-                                        helpButton("helpTrees"),
-                                        style = 'margin-left: 0px;'
-                                    ),
-                                    numericInput("rf.ntree", "", NULL, min = 1),
-                                    fluidRow(
-                                        h6("Node Size"),
-                                        helpButton("helpNodesize"),
-                                        style = 'margin-left: 0px;'
-                                    ),
-                                    numericInput("rf.nodesize", "", NULL, min = 1),
-                                    fluidRow(
-                                        h6("Random Seed"),
-                                        ##helpButton("helpSeed"),
-                                        style = 'margin-left: 0px;'
-                                    ),
-                                    numericInput("rf.seed", "", value = 1000, min = 0)
-                                ),
-                                column(6,
-                                    fluidRow(
-                                        h6("Number of Bootstraps"),
-                                        helpButton("helpBootstraps"),
-                                        style = 'margin-left: 0px;'
-                                    ),
-                                    numericInput("nbootstraps", "", NULL),
-                                    fluidRow(
-                                        h6("Sample Size"),
-                                        helpButton("helpSampsize"),
-                                        style = 'margin-left: 0px;'
-                                    ),
-                                    numericInput("rf.sampsize", "", NULL, min = 1),
-                                    fluidRow(
-                                        h6("alphas"),
-                                        helpButton("helpAlphas"),
-                                        style = 'margin-left: 0px;'
-                                    ),
-                                    textInput("alphas", "", NULL)
-                                )
-                            ),
-                            column(2,
-                                actionButton(
-                                    "validate",
-                                    "Validate Settings",
-                                    style = 'margin-top: 30px;'),
-                                offset = 9
-                            )
-                        )
-                    )
-                )
-            ),
+                    ## Column Selection
+                    fluidRow(
+                        column(6,
+                               fluidPage(id = 'radio',
+                                   uiOutput("columns")
+                               )),
+                        column(3,
+                               fluidRow(
+                                   h6("Number of Randomforest Trees"),
+                                   helpButton("helpTrees"),
+                                   style = 'margin-left: 0px;'
+                               ),
+                               numericInput("rf.ntree", "", NULL, min = 1),
+                               fluidRow(
+                                   h6("Node Size"),
+                                   helpButton("helpNodesize"),
+                                   style = 'margin-left: 0px;'
+                               ),
+                               numericInput("rf.nodesize", "", NULL, min = 1),
+                               fluidRow(
+                                   h6("Random Seed"),
+                                   ##helpButton("helpSeed"),
+                                   style = 'margin-left: 0px;'
+                               ),
+                               numericInput("rf.seed", "", value = 1000, min = 0)
+                               ),
+                        column(3,
+                               fluidRow(
+                                   h6("Number of Bootstraps"),
+                                   helpButton("helpBootstraps"),
+                                   style = 'margin-left: 0px;'
+                               ),
+                               numericInput("nbootstraps", "", NULL),
+                               fluidRow(
+                                   h6("Sample Size"),
+                                   helpButton("helpSampsize"),
+                                   style = 'margin-left: 0px;'
+                               ),
+                               numericInput("rf.sampsize", "", NULL, min = 1),
+                               fluidRow(
+                                   h6("alphas"),
+                                   helpButton("helpAlphas"),
+                                   style = 'margin-left: 0px;'
+                               ),
+                               textInput("alphas", "", NULL)
+                               )),
+                    uiOutput("msg"),
+                    actionButton("validate","Validate Settings",
+                                 style = 'margin-top: 30px;')
+                    )),
             uiOutput("compute")
         )
 }
