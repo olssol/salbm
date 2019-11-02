@@ -1,5 +1,5 @@
 # random forest joint prob distribution
-rfjp <- function( data, ntree = 1000, seed = -1, sampsize = nrow(data), nodesize = 1 )
+rfjp <- function( data, ntree = 1000, seed = -1, nodesize = 1 )
   {
      colnms  <-  names(data)
      nrows   <-  nrow(data)
@@ -10,7 +10,7 @@ rfjp <- function( data, ntree = 1000, seed = -1, sampsize = nrow(data), nodesize
        inames       <- colnms[1:(j-1)]
        modelF       <- paste( colnms[j], "~", paste( inames, sep = " ", collapse="+" ) ) 
        TData        <- data[, colnms[1:j] ]
-       rfout        <- rfsrc( as.formula(modelF), data = TData, ntree= ntree, seed = seed - j, sampsize = sampsize, samptype = "swor", nodesize = nodesize )
+       rfout        <- rfsrc( as.formula(modelF), data = TData, ntree= ntree, seed = seed - j, ensemble = "all", bootstrap = "by.root", sampsize = nrows, samptype = "swr", nodesize = nodesize )
  
        ndata        <- data.frame(mkPatr3( j - 1 ))
        names(ndata) <- inames

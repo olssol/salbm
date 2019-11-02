@@ -2,7 +2,7 @@
 tilt <- function( alpha, results ) {
   Res    <- results
   len    <- length(results)
-  nn     <- log(len,base=3)
+  nn     <- round(log(len,base=3))
   Ealpha <- exp(alpha)
   for ( j in 1:nn ) {
     len  <- length(Res)
