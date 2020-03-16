@@ -1,5 +1,7 @@
 # dosamp: read a sample from samples based on the sampno column, tilt by alphas
-dosamp <- function( sampno, samples,  rf.ntree = 1000, rfseeds, rf.nodesize = 1, alphas = c(0) )  {
+dosamp <- function( sampno, samples,
+                   rf.ntree = 1000, rfseeds,
+                   rf.nodesize = 1, alphas = c(0) )  {
     print(sampno)
    ncolsamp               <-   ncol(samples) - 1
    sample                 <-   samples[ samples[,1] == sampno, 2:(ncolsamp+1) ]
