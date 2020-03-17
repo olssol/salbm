@@ -69,8 +69,7 @@ server <- (function(input, output, session) {
     data$trt         <- NULL;
     data$trtlev      <- NULL;
     data$rf.ntree    <- NULL;
-    data$rf.seed     <- NULL;
-    data$rf.sampsize <- NULL;
+    data$primeseeds  <- NULL;
     data$rf.nodesize <- NULL;
     data$nbootstraps <- NULL;
     data$alphas      <- NULL;
@@ -92,7 +91,6 @@ server <- (function(input, output, session) {
     callModule(helpModal, "helpNodesize", "Nodesize",  "www/placeholder.html");
     callModule(helpModal, "helpSeed", "Seed",  "www/placeholder.html");
     callModule(helpModal, "helpBootstraps", "Number of Bootstraps", "www/placeholder.html");
-    callModule(helpModal, "helpSampsize", "Sample Size",  "www/placeholder.html");
     callModule(helpModal, "helpAlphas", "Alphas", "www/placeholder.html");
 
 
@@ -316,12 +314,10 @@ server <- (function(input, output, session) {
 
         # Check For NA in Settings and Invalid Settings
         if (is.na(input$rf.ntree) ||
-            is.na(input$rf.seed) ||
-            is.na(input$rf.sampsize) ||
+            is.na(input$primeseeds) ||
             is.na(input$rf.nodesize) ||
             is.na(input$nbootstraps) ||
             input$rf.ntree <= 0 ||
-            input$rf.sampsize <= 0 ||
             input$rf.nodesize <= 0 ||
                 length(
                     as.numeric(strsplit(input$alphas, ",")[[1]])
@@ -337,8 +333,7 @@ server <- (function(input, output, session) {
         data$trt <- colnames(newData)[1];
         data$trtlev <- unique(newData[,1]);
         data$rf.ntree <- input$rf.ntree;
-        data$rf.seed <- input$rf.seed;
-        data$rf.sampsize <- input$rf.sampsize;
+        data$primeseeds <- input$primeseeds;
         data$rf.nodesize <- input$rf.nodesize;
         data$nbootstraps <- input$nbootstraps;
         data$alphas <- sort(as.numeric(strsplit(input$alphas, ",")[[1]]))[1]:
@@ -453,9 +448,8 @@ server <- (function(input, output, session) {
 
         updateNumericInput(session, "rf.ntree", "", value = 25);
         updateNumericInput(session, "rf.nodesize", "", value = 3);
-        updateNumericInput(session, "rf.seed", "", value = 0);
+        updateNumericInput(session, "primeseeds", "", value = 0);
         updateNumericInput(session, "nbootstraps", "", value = 5);
-        updateNumericInput(session, "rf.sampsize", "", value = 90);
         updateTextInput(session, "alphas", "", value = "-1, 1");
 
         v$v <- TRUE;
@@ -464,8 +458,7 @@ server <- (function(input, output, session) {
         data$trt         <- colnames(data$dataframe)[1];
         data$trtlev      <- unique(data$dataframe[,1]);
         data$rf.ntree    <- 25;
-        data$rf.seed     <-  0;
-        data$rf.sampsize <- 90;
+        data$primeseeds  <- 0;
         data$rf.nodesize <- 3;
         data$nbootstraps <- 5;
         data$alphas <- -1:1;
@@ -519,8 +512,7 @@ server <- (function(input, output, session) {
             trt = data$trt,
             trtlev = data$trtlev,
             rf.ntree = data$rf.ntree,
-            rf.seed = data$rf.seed,
-            rf.sampsize = data$rf.sampsize,
+            primeseeds = data$primeseeds,
             rf.nodesize = data$rf.nodesize,
             nbootstraps = data$nbootstraps,
             alphas = data$alphas

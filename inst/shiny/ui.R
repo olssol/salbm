@@ -99,7 +99,7 @@ tab.data  <- function() {
                 ## Show Input Table After Uploading
                 uiOutput("table")
             )
-            )
+    )
 }
 
 
@@ -137,7 +137,7 @@ tab.setting <- function() {
                                    ##helpButton("helpSeed"),
                                    style = 'margin-left: 0px;'
                                ),
-                               numericInput("rf.seed", "", value = 1000, min = 0)
+                               numericInput("primeseeds", "", value = 1000, min = 0)
                                ),
                         column(3,
                                fluidRow(
@@ -146,12 +146,6 @@ tab.setting <- function() {
                                    style = 'margin-left: 0px;'
                                ),
                                numericInput("nbootstraps", "", NULL),
-                               fluidRow(
-                                   h6("Sample Size"),
-                                   helpButton("helpSampsize"),
-                                   style = 'margin-left: 0px;'
-                               ),
-                               numericInput("rf.sampsize", "", NULL, min = 1),
                                fluidRow(
                                    h6("alphas"),
                                    helpButton("helpAlphas"),
